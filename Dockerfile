@@ -7,9 +7,6 @@ WORKDIR /app
 # 필요한 패키지 설치를 위한 requirements.txt 복사
 COPY requirements.txt .
 
-RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
-    apt install -y ./google-chrome-stable_current_amd64.deb
-
 # 시스템 패키지 및 Python 패키지 설치
 RUN apt-get update && \
     apt-get install -y --no-install-recommends gcc python3-dev curl wget gnupg2 && \
