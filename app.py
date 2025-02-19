@@ -4,6 +4,10 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 import re
+import logging
+
+# 로거 설정
+logger = logging.getLogger("uvicorn")
 
 app = FastAPI()
 
@@ -25,7 +29,7 @@ def extract_youtube_id(url: str) -> str:
 async def get_youtube_transcript(url: str):
     try:
         video_id = extract_youtube_id(url)
-        transcript = YouTubeTranscriptApi.get_transcript(video_id)
+        transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=['ko'])
         
         # 자막 텍스트만 추출하여 하나의 문자열로 결합
         full_text = " ".join([entry["text"] for entry in transcript])
@@ -58,7 +62,11 @@ async def get_web_content(url: str):
         
         # 텍스트 추출 및 정리
         text = soup.get_text()
+        logger.info(f"추출된 전체 텍스트: {text[:500]}...") # 처음 500자만 출력
+        
         lines = [line.strip() for line in text.splitlines() if line.strip()]
+        logger.info(f"정리된 라인들: {lines[:10]}...") # 처음 10줄만 출력
+        
         content = ' '.join(lines)
         
         return {"text": content}
