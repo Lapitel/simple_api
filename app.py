@@ -14,7 +14,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import chromedriver_autoinstaller
 
 # 로거 설정
-logger = logging.getLogger("uvicorn")
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
