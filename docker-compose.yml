@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  api:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: simple-api
+    ports:
+      - "1818:1818"
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Seoul
+    volumes:
+      - ./app.py:/app/app.py 
