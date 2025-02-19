@@ -27,7 +27,8 @@ chrome_options.add_argument('--disable-gpu')
 
 def get_chrome_driver():
     """Chrome WebDriver 인스턴스를 생성하고 반환하는 함수"""
-    driver = webdriver.Chrome(options=chrome_options)
+    service = Service('/usr/bin/chromedriver')
+    driver = webdriver.Chrome(service=service, options=chrome_options)
     return driver
 
 def extract_youtube_id(url: str) -> str:
