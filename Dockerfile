@@ -1,38 +1,22 @@
 # Python 3.12 slim 이미지를 기반으로 사용
 FROM python:3.12-slim
 
-# Chrome 관련 환경변수 설정
-ENV CHROME_BIN=/usr/bin/google-chrome
-ENV CHROMEDRIVER_DIR=/usr/bin/chromedriver
-ENV DEBIAN_FRONTEND=noninteractive
-
 # 작업 디렉토리 설정
 WORKDIR /app
 
 # 필요한 패키지 설치를 위한 requirements.txt 복사
 COPY requirements.txt .
 
+RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
+    apt install -y ./google-chrome-stable_current_amd64.deb
+
 # 시스템 패키지 및 Python 패키지 설치
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        gcc \
-        python3-dev \
-        curl \
-        wget \
-        gnupg2 \
-        unzip \
-        xvfb && \
+    apt-get install -y --no-install-recommends gcc python3-dev curl wget gnupg2 && \
     wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \
     echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list && \
     apt-get update && \
     apt-get install -y google-chrome-stable && \
-    CHROME_VERSION=$(google-chrome --version | awk '{print $3}' | awk -F'.' '{print $1}') && \
-    CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION}") && \
-    wget -q "https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip" && \
-    unzip chromedriver_linux64.zip && \
-    mv chromedriver /usr/bin/chromedriver && \
-    chmod +x /usr/bin/chromedriver && \
-    rm chromedriver_linux64.zip && \
     pip install --no-cache-dir -r requirements.txt && \
     apt-get remove -y gcc python3-dev && \
     apt-get autoremove -y && \

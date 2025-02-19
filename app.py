@@ -8,10 +8,10 @@ import logging
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import chromedriver_autoinstaller
 
 # 로거 설정
 logger = logging.getLogger("uvicorn")
@@ -27,8 +27,8 @@ chrome_options.add_argument('--disable-gpu')
 
 def get_chrome_driver():
     """Chrome WebDriver 인스턴스를 생성하고 반환하는 함수"""
-    service = Service('/usr/bin/chromedriver')
-    driver = webdriver.Chrome(service=service, options=chrome_options)
+    chromedriver_autoinstaller.install()  # ChromeDriver 자동 설치
+    driver = webdriver.Chrome(options=chrome_options)
     return driver
 
 def extract_youtube_id(url: str) -> str:
