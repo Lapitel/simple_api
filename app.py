@@ -16,20 +16,9 @@ import chromedriver_autoinstaller
 # 로거 설정
 logger = logging.getLogger(__name__)
 
+chromedriver_autoinstaller.install()  # ChromeDriver 자동 설치
+
 app = FastAPI()
-
-# Chrome 옵션 설정
-chrome_options = Options()
-chrome_options.add_argument('--headless')  # Headless 모드
-chrome_options.add_argument('--no-sandbox')
-chrome_options.add_argument('--disable-dev-shm-usage')
-chrome_options.add_argument('--disable-gpu')
-
-def get_chrome_driver():
-    """Chrome WebDriver 인스턴스를 생성하고 반환하는 함수"""
-    chromedriver_autoinstaller.install()  # ChromeDriver 자동 설치
-    driver = webdriver.Chrome(options=chrome_options)
-    return driver
 
 def extract_youtube_id(url: str) -> str:
     """YouTube URL에서 영상 ID를 추출하는 함수"""
@@ -67,8 +56,16 @@ async def get_web_content(url: str):
         if not parsed_url.scheme or not parsed_url.netloc:
             raise ValueError("유효하지 않은 URL입니다.")
         
+        # Chrome 옵션 설정
+        chrome_options = Options()
+        chrome_options.add_argument("disable-gpu")
+        chrome_options.add_argument('--headless')  # Headless 모드
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--disable-dev-shm-usage')
+        chrome_options.add_argument("--remote-debugging-port=9222")
+
         # Selenium WebDriver 초기화
-        driver = get_chrome_driver()
+        driver = webdriver.Chrome(options=chrome_options)
         driver.get(url)
         
         # 페이지가 완전히 로드될 때까지 대기
@@ -98,6 +95,7 @@ async def get_web_content(url: str):
         
         return {"text": content}
     except Exception as e:
+        logger.error(f"오류 발생: {str(e)}")
         raise HTTPException(status_code=400, detail=str(e))
     finally:
         if driver:

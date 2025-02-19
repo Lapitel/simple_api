@@ -6,6 +6,8 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: simple-api
+    security_opt:
+      - seccomp=unconfined
     ports:
       - "1818:1818"
     restart: unless-stopped
